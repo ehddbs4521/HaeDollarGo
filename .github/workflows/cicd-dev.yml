@@ -88,5 +88,5 @@ jobs:
             sudo docker compose down  
             sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}  
             sudo docker pull ${{ secrets.DOCKER_DEV_IMAGE }}
-            sudo docker-compose -f docker-compose.dev.yml up -d
+            sudo docker compose -f docker-compose.dev.yml up -d
             sudo docker image prune -f
