@@ -1,0 +1,45 @@
+services:
+  haedollargo-dev:
+    image: ${DOCKER_DEV_IMAGE}
+    container_name: haedollargo-dev
+    ports:
+      - 80:8080
+    networks:
+      - app-tier
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_USERNAME: ${MYSQL_USERNAME}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - ./mysql_dev_data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    networks:
+      - app-tier
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping"]
+      interval: 6s
+      retries: 10
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 6s
+      retries: 10
+
+networks:
+  app-tier:
+    driver: bridge
