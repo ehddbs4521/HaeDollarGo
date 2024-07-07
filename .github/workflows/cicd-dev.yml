@@ -50,6 +50,10 @@ jobs:
           spring.datasource.url: ${{ secrets.MYSQL_URL }}
           spring.datasource.username: ${{ secrets.MYSQL_USERNAME }}
           spring.datasource.password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          cloud.aws.s3.bucket: ${{ secrets.AWS_BUCKET }}
+          cloud.aws.region.static: ${{ secrets.AWS_REGION }}
+          cloud.aws.credentials.accessKey: ${{ secrets.AWS_ACCESS_KEY }}
+          cloud.aws.credentials.secretKey: ${{ secrets.AWS_SECRET_KEY }}
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
