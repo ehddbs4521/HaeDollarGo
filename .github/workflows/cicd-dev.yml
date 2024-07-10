@@ -50,6 +50,7 @@ jobs:
           spring.datasource.url: ${{ secrets.MYSQL_URL }}
           spring.datasource.username: ${{ secrets.MYSQL_USERNAME }}
           spring.datasource.password: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          jwt.secret.key: ${{ secrets.JWT_KEY }}
           cloud.aws.s3.bucket: ${{ secrets.AWS_BUCKET }}
           cloud.aws.region.static: ${{ secrets.AWS_REGION }}
           cloud.aws.credentials.accessKey: ${{ secrets.AWS_ACCESS_KEY }}
