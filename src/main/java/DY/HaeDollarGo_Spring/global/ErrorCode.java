@@ -31,6 +31,10 @@ public enum ErrorCode {
     SEND_EMAIL_FAIL(HttpStatus.INTERNAL_SERVER_ERROR,"SAS1","이메일 전송을 실패했습니다."),
     NOT_EQUAL_EACH_TOKEN_SOCIALID(HttpStatus.BAD_REQUEST, "SAT10","로그인한 사용자의 Refresh Token이 아닙니다"),
     ILLEGAL_TOKEN(HttpStatus.BAD_REQUEST, "SAT11","JWT 토큰이 잘못되었습니다."),
+    SUCCESS(HttpStatus.OK, "11", "요청 성공"),
+    SC_FORBIDDEN(HttpStatus.FORBIDDEN, "200", "권한 없음"),
+    UN_AUTHORIZED(HttpStatus.UNAUTHORIZED, "121", "토큰 검증 실패"),
+
 
 
     WRONG_ADMIN_CODE(HttpStatus.BAD_REQUEST,"SAA1","Admin코드가 틀렸습니다."),

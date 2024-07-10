@@ -20,16 +20,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken = resolveToken(request);
 
-        try {
-            if (accessToken != null && jwtProvider.validateAccessToken(accessToken)) {
-                Authentication authentication = jwtProvider.getAuthentication(accessToken);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        }catch (RuntimeException e){
-            SecurityContextHolder.clearContext();
-        }catch (Exception e){
-            SecurityContextHolder.clearContext();
+
+        if (accessToken != null && jwtProvider.validateAccessToken(accessToken)) {
+            Authentication authentication = jwtProvider.getAuthentication(accessToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+
         filterChain.doFilter(request,response);
     }
 

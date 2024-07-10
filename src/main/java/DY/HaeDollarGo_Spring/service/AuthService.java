@@ -1,8 +1,5 @@
 package DY.HaeDollarGo_Spring.service;
 
-import DY.HaeDollarGo_Spring.domain.auth.User;
-import DY.HaeDollarGo_Spring.global.CustomException;
-import DY.HaeDollarGo_Spring.global.ErrorCode;
 import DY.HaeDollarGo_Spring.repository.UserRepository;
 import DY.HaeDollarGo_Spring.security.jwt.dto.response.TokenResponse;
 import DY.HaeDollarGo_Spring.security.jwt.service.JwtProvider;
@@ -27,7 +24,6 @@ public class AuthService {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtProvider jwtProvider;
-    private final UserRepository userRepository;
     private final RedisService redisService;
 
     private final String LOGOUT ="logout";
@@ -107,13 +103,12 @@ public class AuthService {
 
         String refreshTokenInRedis = redisService.getValues("RT(" + email + "_" + socialType + ")");
         if (refreshTokenInRedis == null) {
-            return null; // -> 재로그인 요청
+            return null;
         }
 
-        // RT의 유효성 검사
         if (!jwtProvider.validateRefreshToken(refreshTokenInRedis)) {
             redisService.deleteValues("RT(" + email + "_" + socialType + ")"); // 삭제
-            return null; // -> 재로그인 요청
+            return null;
         }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);

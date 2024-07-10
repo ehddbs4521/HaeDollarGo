@@ -1,5 +1,7 @@
 package DY.HaeDollarGo_Spring.config;
 
+import DY.HaeDollarGo_Spring.common.JwtAccessDeniedHandler;
+import DY.HaeDollarGo_Spring.common.JwtAuthenticationEntryPoint;
 import DY.HaeDollarGo_Spring.security.jwt.error.JwtExceptionFilter;
 import DY.HaeDollarGo_Spring.security.jwt.filter.JwtAuthenticationFilter;
 import DY.HaeDollarGo_Spring.security.jwt.service.JwtProvider;
@@ -26,22 +28,27 @@ import static DY.HaeDollarGo_Spring.common.Role.Admin;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-     private final JwtProvider jwtProvider;
+    private final JwtProvider jwtProvider;
     private final JwtExceptionFilter jwtExceptionFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf((csrf) -> csrf.disable())
+                .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .formLogin(formLogin -> formLogin.disable())
-                .httpBasic(httpBasic -> httpBasic.disable())
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/admin/**").hasRole(Admin.toString())
                         .anyRequest().authenticated());
-        http.addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class); ;
+
+        http.addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class);
 
         return http.build();
@@ -51,6 +58,7 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
