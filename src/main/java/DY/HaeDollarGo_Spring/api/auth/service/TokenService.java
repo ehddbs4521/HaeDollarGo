@@ -9,12 +9,9 @@ import DY.HaeDollarGo_Spring.global.common.TokenValue;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class TokenService {
@@ -24,36 +21,24 @@ public class TokenService {
     private final TokenProvider tokenProvider;
 
     private static final String URL = "/auth/success";
+
     public boolean existsTokenInBlackList(String token) {
-
         BlackList blackList = blackListRepository.findById(token).orElseGet(null);
-
-        if (blackList != null) {
-            return true;
-        }
-
-        return false;
+        return blackList != null;
     }
 
     public boolean existsTokenInRefresh(String token) {
-
         RefreshToken refreshToken = refreshTokenRepository.findById(token).orElseGet(null);
-
-        if (refreshToken != null) {
-            return true;
-        }
-
-        return false;
+        return refreshToken != null;
     }
+
     @Transactional
     public void saveOrUpdate(String userKey, String refreshToken) {
         RefreshToken token = refreshTokenRepository.findById(refreshToken)
                 .map(o -> o.updateRefreshToken(refreshToken, TokenValue.REFRESH_TTL))
                 .orElseGet(() -> new RefreshToken(refreshToken, TokenValue.REFRESH_TTL));
-
         refreshTokenRepository.save(token);
     }
-
 
     @Transactional
     public void updateToken(String accessToken, String refreshToken) {
@@ -69,9 +54,7 @@ public class TokenService {
 
         blackListRepository.save(accessTokenInBlackList);
         blackListRepository.save(refreshTokenInBlackList);
-
         refreshTokenRepository.deleteById(refreshToken);
-
     }
 
     public static void setTokenInHeader(HttpServletResponse response, String token) {
@@ -80,12 +63,10 @@ public class TokenService {
 
     public static void setTokenInCookie(HttpServletResponse response, String token) {
         Cookie cookie = new Cookie(TokenValue.REFRESH_HEADER, token);
-
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setPath(URL);
         cookie.setMaxAge(TokenValue.REFRESH_TTL.intValue());
-
         response.addCookie(cookie);
     }
 }

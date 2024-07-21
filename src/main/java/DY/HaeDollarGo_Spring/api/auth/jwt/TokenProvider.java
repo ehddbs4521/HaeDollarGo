@@ -43,6 +43,7 @@ public class TokenProvider {
     private static final String KEY_ROLE = "role";
     private static final String ACCESS = "Authorization-Access";
     private static final String REFRESH = "Authorization-Refresh";
+
     private final TokenService tokenService;
 
     @PostConstruct
@@ -92,7 +93,6 @@ public class TokenProvider {
     }
 
     public String reissueToken(String token) {
-
         if (validateToken(token)) {
             if (tokenService.existsTokenInRefresh(token)) {
                 return generateAccessToken(getAuthentication(token));
@@ -104,11 +104,9 @@ public class TokenProvider {
 
     boolean validateToken(String token) {
         if (StringUtils.hasText(token) && !tokenService.existsTokenInBlackList(token)) {
-
             Claims claims = parseClaims(token);
             return claims.getExpiration().after(new Date());
         }
-
         return false;
     }
 
@@ -145,7 +143,6 @@ public class TokenProvider {
     }
 
     public String getRefreshTokenInCookie(HttpServletRequest request) {
-
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
