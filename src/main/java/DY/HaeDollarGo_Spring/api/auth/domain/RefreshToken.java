@@ -1,13 +1,13 @@
 package DY.HaeDollarGo_Spring.api.auth.domain;
 
-import jakarta.persistence.Id;
+import org.springframework.data.annotation.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 
 @Getter
-@RedisHash("jwt")
+@RedisHash("refresh")
 @AllArgsConstructor
 public class RefreshToken {
 
@@ -21,7 +21,7 @@ public class RefreshToken {
         this.ttl = ttl;
     }
 
-    public RefreshToken updateRefreshToken(String token,Long ttl) {
+    public RefreshToken updateRefreshToken(String token, Long ttl) {
         this.token = token;
         this.ttl = ttl;
         return this;
