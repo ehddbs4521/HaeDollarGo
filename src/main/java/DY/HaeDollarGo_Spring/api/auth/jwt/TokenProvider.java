@@ -1,7 +1,10 @@
 package DY.HaeDollarGo_Spring.api.auth.jwt;
 
+import DY.HaeDollarGo_Spring.api.auth.domain.BlackList;
+import DY.HaeDollarGo_Spring.api.auth.domain.RefreshToken;
 import DY.HaeDollarGo_Spring.api.auth.exception.TokenException;
-import DY.HaeDollarGo_Spring.api.auth.service.TokenService;
+import DY.HaeDollarGo_Spring.api.auth.repository.BlackListRepository;
+import DY.HaeDollarGo_Spring.api.auth.repository.RefreshTokenRepository;
 import DY.HaeDollarGo_Spring.global.common.TokenValue;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -20,6 +23,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -39,12 +43,12 @@ public class TokenProvider {
     @Value("${jwt.secret.key}")
     private String key;
     private SecretKey secretKey;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final BlackListRepository blackListRepository;
 
     private static final String KEY_ROLE = "role";
     private static final String ACCESS = "Authorization-Access";
     private static final String REFRESH = "Authorization-Refresh";
-
-    private final TokenService tokenService;
 
     @PostConstruct
     private void setSecretKey() {
@@ -57,7 +61,7 @@ public class TokenProvider {
 
     public String generateRefreshToken(Authentication authentication) {
         String refreshToken = generateToken(authentication, TokenValue.REFRESH_TTL, REFRESH);
-        tokenService.saveOrUpdate(authentication.getName(), refreshToken);
+        saveOrUpdate(authentication.getName(), refreshToken);
 
         return refreshToken;
     }
@@ -94,7 +98,7 @@ public class TokenProvider {
 
     public String reissueToken(String token) {
         if (validateToken(token)) {
-            if (tokenService.existsTokenInRefresh(token)) {
+            if (existsTokenInRefresh(token)) {
                 return generateAccessToken(getAuthentication(token));
             }
         }
@@ -103,7 +107,7 @@ public class TokenProvider {
     }
 
     boolean validateToken(String token) {
-        if (StringUtils.hasText(token) && !tokenService.existsTokenInBlackList(token)) {
+        if (StringUtils.hasText(token) && !existsTokenInBlackList(token)) {
             Claims claims = parseClaims(token);
             return claims.getExpiration().after(new Date());
         }
@@ -155,5 +159,23 @@ public class TokenProvider {
             }
         }
         return null;
+    }
+
+    public boolean existsTokenInBlackList(String token) {
+        BlackList blackList = blackListRepository.findById(token).orElseGet(null);
+        return blackList != null;
+    }
+
+    public boolean existsTokenInRefresh(String token) {
+        RefreshToken refreshToken = refreshTokenRepository.findById(token).orElseGet(null);
+        return refreshToken != null;
+    }
+
+    @Transactional
+    public void saveOrUpdate(String userKey, String refreshToken) {
+        RefreshToken token = refreshTokenRepository.findById(refreshToken)
+                .map(o -> o.updateRefreshToken(refreshToken, TokenValue.REFRESH_TTL))
+                .orElseGet(() -> new RefreshToken(refreshToken, TokenValue.REFRESH_TTL));
+        refreshTokenRepository.save(token);
     }
 }

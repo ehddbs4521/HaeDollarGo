@@ -1,6 +1,7 @@
 package DY.HaeDollarGo_Spring.api.auth.jwt;
 
 import DY.HaeDollarGo_Spring.api.auth.exception.TokenException;
+import DY.HaeDollarGo_Spring.api.auth.service.TokenService;
 import DY.HaeDollarGo_Spring.global.common.TokenValue;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,7 +1,6 @@
 package DY.HaeDollarGo_Spring.api.auth.service;
 
 import DY.HaeDollarGo_Spring.api.auth.domain.BlackList;
-import DY.HaeDollarGo_Spring.api.auth.domain.RefreshToken;
 import DY.HaeDollarGo_Spring.api.auth.jwt.TokenProvider;
 import DY.HaeDollarGo_Spring.api.auth.repository.BlackListRepository;
 import DY.HaeDollarGo_Spring.api.auth.repository.RefreshTokenRepository;
@@ -21,24 +20,6 @@ public class TokenService {
     private final TokenProvider tokenProvider;
 
     private static final String URL = "/auth/success";
-
-    public boolean existsTokenInBlackList(String token) {
-        BlackList blackList = blackListRepository.findById(token).orElseGet(null);
-        return blackList != null;
-    }
-
-    public boolean existsTokenInRefresh(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findById(token).orElseGet(null);
-        return refreshToken != null;
-    }
-
-    @Transactional
-    public void saveOrUpdate(String userKey, String refreshToken) {
-        RefreshToken token = refreshTokenRepository.findById(refreshToken)
-                .map(o -> o.updateRefreshToken(refreshToken, TokenValue.REFRESH_TTL))
-                .orElseGet(() -> new RefreshToken(refreshToken, TokenValue.REFRESH_TTL));
-        refreshTokenRepository.save(token);
-    }
 
     @Transactional
     public void updateToken(String accessToken, String refreshToken) {
