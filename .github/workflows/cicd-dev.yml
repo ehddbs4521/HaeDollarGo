@@ -39,7 +39,6 @@ jobs:
       - name: Create application-dev.yml
         run: |
           mkdir -p ./src/main/resources
-          echo "${{ secrets.OAUTH }}" > ./src/main/resources/application-oauth.yml
           echo "${{ secrets.PROPERTIES_DEV }}" > ./src/main/resources/application-dev.yml
         shell: bash
 
