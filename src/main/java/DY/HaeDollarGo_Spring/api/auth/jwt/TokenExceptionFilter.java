@@ -18,6 +18,9 @@ public class TokenExceptionFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         try {
+            if (request.getRequestURI().equals("/")) {
+                filterChain.doFilter(request, response);
+            }
             filterChain.doFilter(request, response);
         } catch (TokenException e) {
             response.setContentType("application/json;charset=UTF-8");
