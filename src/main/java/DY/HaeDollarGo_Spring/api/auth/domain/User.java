@@ -15,7 +15,7 @@ public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private String id;
+    private Long id;
 
     @Column(name = "email", nullable = false)
     private String email;
@@ -37,7 +37,7 @@ public class User extends BaseEntity {
     private String nickName;
 
     @Builder
-    public User(String id, String email, String socialType, Role role, String profile, String userKey, String nickName) {
+    public User(Long id, String email, String socialType, Role role, String profile, String userKey, String nickName) {
         this.id = id;
         this.email = email;
         this.socialType = socialType;
