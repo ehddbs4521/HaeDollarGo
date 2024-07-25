@@ -23,6 +23,6 @@ public abstract class BaseEntity {
 
     @JsonIgnore
     @LastModifiedDate
-    @Column(name = "modified_date")
+    @Column(name = "modified_date", insertable = false)
     private LocalDateTime modifiedDate;
 }
