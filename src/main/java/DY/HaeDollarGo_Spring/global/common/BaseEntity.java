@@ -13,14 +13,16 @@ import java.time.LocalDateTime;
 
 @Getter
 @MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
     @JsonIgnore
     @CreatedDate
+    @Column(name = "created_date", updatable = false)
     private LocalDateTime createdDate;
 
     @JsonIgnore
     @LastModifiedDate
-    @Column(insertable = false)
+    @Column(name = "modified_date")
     private LocalDateTime modifiedDate;
 }
