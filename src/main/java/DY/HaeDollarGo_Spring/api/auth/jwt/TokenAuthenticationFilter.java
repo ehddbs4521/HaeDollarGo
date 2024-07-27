@@ -29,10 +29,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
-        boolean choice = isUnprotectedEndpoint(request);
-        log.info("choice: {}", choice);
-        if (choice) {
-            log.info("dqdqd");
+
+        log.info("url: {}", request.getRequestURI());
+        if (isUnprotectedEndpoint(request)) {
+
             filterChain.doFilter(request, response);
             return;
         }

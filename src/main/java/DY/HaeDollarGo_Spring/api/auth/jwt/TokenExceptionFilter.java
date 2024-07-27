@@ -18,14 +18,12 @@ public class TokenExceptionFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        boolean choice = isUnprotectedEndpoint(request);
-        log.info("choice2: {}", choice);
-        if (choice) {
-            log.info("adadd");
+        log.info("url: {}", request.getRequestURI());
+
+        if (isUnprotectedEndpoint(request)) {
             filterChain.doFilter(request, response);
             return;
         }
-        log.info("zvzvzv");
         try {
             filterChain.doFilter(request, response);
         } catch (TokenException e) {
