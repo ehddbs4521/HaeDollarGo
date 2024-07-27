@@ -31,7 +31,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain) throws ServletException, IOException {
         if (isUnprotectedEndpoint(request)) {
             log.info("pass2");
-            filterChain.doFilter(request, response);
             return;
         }
         log.info("aaa");

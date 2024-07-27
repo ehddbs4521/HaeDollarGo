@@ -20,7 +20,6 @@ public class TokenExceptionFilter extends OncePerRequestFilter {
 
         if (isUnprotectedEndpoint(request)) {
             log.info("pass");
-            filterChain.doFilter(request, response);
             return;
         }
         log.info("vsvv");
