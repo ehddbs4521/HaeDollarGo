@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/**","/").permitAll()
                         .requestMatchers("/admin/**").hasRole(Admin.toString())
                         .anyRequest().authenticated())
                 .oauth2Login(oauth ->
