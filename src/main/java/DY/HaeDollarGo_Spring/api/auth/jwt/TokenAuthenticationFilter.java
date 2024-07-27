@@ -30,10 +30,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
         if (isUnprotectedEndpoint(request)) {
-            log.info("pass2");
+            filterChain.doFilter(request, response);
             return;
         }
-        log.info("aaa");
 
         String accessToken = tokenProvider.resolveTokenInHeader(request);
 
