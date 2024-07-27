@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
-    @GetMapping("/login-success")
+    @GetMapping("/success")
     public String loginSuccess(HttpServletResponse response) {
         return "success";
     }
