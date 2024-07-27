@@ -29,12 +29,13 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
-        log.info("aaa");
         if (isUnprotectedEndpoint(request)) {
             log.info("pass2");
             filterChain.doFilter(request, response);
             return;
         }
+        log.info("aaa");
+
         String accessToken = tokenProvider.resolveTokenInHeader(request);
 
         if (tokenProvider.validateToken(accessToken)) {
