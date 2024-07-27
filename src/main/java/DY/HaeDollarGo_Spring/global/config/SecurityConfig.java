@@ -43,9 +43,6 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                        .accessDeniedHandler(jwtAccessDeniedHandler))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -56,10 +53,12 @@ public class SecurityConfig {
                         oauth.userInfoEndpoint(c -> c.userService(oAuth2UserService))
                                 .successHandler(oAuth2SuccessHandler)
                                 .failureHandler(oAuth2FailureHandler)
-                );
-
-        http.addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(new TokenExceptionFilter(), tokenAuthenticationFilter.getClass());
+                )
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new TokenExceptionFilter(), tokenAuthenticationFilter.getClass())
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler));
 
         return http.build();
     }
