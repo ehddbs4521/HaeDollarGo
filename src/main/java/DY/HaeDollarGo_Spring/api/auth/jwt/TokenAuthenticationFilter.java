@@ -30,12 +30,14 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
+        log.info("url3:{}", request.getRequestURI());
+
         if (isUnprotectedEndpoint(request)) {
 
             filterChain.doFilter(request, response);
             return;
         }
-
+        log.info("url4:{}", request.getRequestURI());
         String accessToken = tokenProvider.resolveTokenInHeader(request);
 
         if (tokenProvider.validateToken(accessToken)) {
