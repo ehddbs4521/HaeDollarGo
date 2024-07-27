@@ -61,7 +61,7 @@ public class TokenProvider {
 
     public String generateRefreshToken(Authentication authentication) {
         String refreshToken = generateToken(authentication, TokenValue.REFRESH_TTL, REFRESH);
-        saveOrUpdate(authentication.getName(), refreshToken);
+        saveOrUpdate(refreshToken);
 
         return refreshToken;
     }
@@ -172,7 +172,7 @@ public class TokenProvider {
     }
 
     @Transactional
-    public void saveOrUpdate(String userKey, String refreshToken) {
+    public void saveOrUpdate(String refreshToken) {
         RefreshToken token = refreshTokenRepository.findById(refreshToken)
                 .map(o -> o.updateRefreshToken(refreshToken, TokenValue.REFRESH_TTL))
                 .orElseGet(() -> new RefreshToken(refreshToken, TokenValue.REFRESH_TTL));

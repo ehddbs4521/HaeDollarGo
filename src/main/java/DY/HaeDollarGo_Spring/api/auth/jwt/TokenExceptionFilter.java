@@ -16,6 +16,11 @@ public class TokenExceptionFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        if (isUnprotectedEndpoint(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
             filterChain.doFilter(request, response);
         } catch (TokenException e) {
@@ -25,5 +30,10 @@ public class TokenExceptionFilter extends OncePerRequestFilter {
             String errorJson = objectMapper.writeValueAsString(e);
             response.getWriter().print(errorJson);
         }
+    }
+
+    private boolean isUnprotectedEndpoint(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return uri.equals("/") || uri.equals("/auth/success");
     }
 }

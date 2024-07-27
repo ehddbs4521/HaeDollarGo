@@ -1,7 +1,6 @@
 package DY.HaeDollarGo_Spring.api.auth.jwt;
 
 import DY.HaeDollarGo_Spring.api.auth.exception.TokenException;
-import DY.HaeDollarGo_Spring.api.auth.service.TokenService;
 import DY.HaeDollarGo_Spring.global.common.TokenValue;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,6 +27,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
+
+        if (isUnprotectedEndpoint(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         String accessToken = tokenProvider.resolveTokenInHeader(request);
 
         if (tokenProvider.validateToken(accessToken)) {
@@ -56,5 +60,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-
+    private boolean isUnprotectedEndpoint(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return uri.equals("/") || uri.equals("/auth/success");
+    }
 }
