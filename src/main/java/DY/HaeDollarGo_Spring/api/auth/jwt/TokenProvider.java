@@ -13,6 +13,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -39,6 +40,7 @@ import static DY.HaeDollarGo_Spring.global.common.RedisValue.BLACKLIST;
 import static DY.HaeDollarGo_Spring.global.common.TokenValue.REFRESH_TTL;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class TokenProvider {
@@ -181,7 +183,7 @@ public class TokenProvider {
     @Transactional
     public void saveOrUpdate(String refreshToken) {
         String token = redisService.getValue(refreshToken, REFRESH);
-
+        log.info("aaaaaaaaaa");
         if (token != null) {
             redisService.saveValue(refreshToken, REFRESH, REFRESH_TTL);
         } else {
