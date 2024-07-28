@@ -2,6 +2,7 @@ package DY.HaeDollarGo_Spring.api.auth.jwt;
 
 import DY.HaeDollarGo_Spring.api.auth.exception.TokenException;
 import DY.HaeDollarGo_Spring.api.auth.service.RedisService;
+import DY.HaeDollarGo_Spring.global.common.RedisValue;
 import DY.HaeDollarGo_Spring.global.common.TokenValue;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -170,7 +171,7 @@ public class TokenProvider {
     }
 
     public boolean existsTokenInRefresh(String token) {
-        String refreshToken = redisService.getValue(token, REFRESH);
+        String refreshToken = redisService.getValue(token, RedisValue.REFRESH);
         return refreshToken != null;
     }
 
@@ -182,15 +183,12 @@ public class TokenProvider {
 
     @Transactional
     public void saveOrUpdate(String refreshToken) {
-        String token = redisService.getValue(refreshToken, REFRESH);
-        log.info("aaaaaaaaaa");
+        String token = redisService.getValue(refreshToken, RedisValue.REFRESH);
         if (token == null) {
-            log.info("asdad");
-            redisService.saveValue(refreshToken, REFRESH, REFRESH_TTL);
+            redisService.saveValue(refreshToken, RedisValue.REFRESH, REFRESH_TTL);
         } else {
-            log.info("vzvv");
             Long ttl = calculateTimeLeft(refreshToken);
-            redisService.updateValue(refreshToken, REFRESH, ttl);
+            redisService.updateValue(refreshToken, RedisValue.REFRESH, ttl);
         }
     }
 }
