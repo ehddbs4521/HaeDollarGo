@@ -1,10 +1,7 @@
 package DY.HaeDollarGo_Spring.api.auth.jwt;
 
-import DY.HaeDollarGo_Spring.api.auth.domain.BlackList;
-import DY.HaeDollarGo_Spring.api.auth.domain.RefreshToken;
 import DY.HaeDollarGo_Spring.api.auth.exception.TokenException;
-import DY.HaeDollarGo_Spring.api.auth.repository.BlackListRepository;
-import DY.HaeDollarGo_Spring.api.auth.repository.RefreshTokenRepository;
+import DY.HaeDollarGo_Spring.api.auth.service.RedisService;
 import DY.HaeDollarGo_Spring.global.common.TokenValue;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -28,12 +25,18 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.*;
+import static DY.HaeDollarGo_Spring.global.common.RedisValue.BLACKLIST;
+import static DY.HaeDollarGo_Spring.global.common.TokenValue.REFRESH_TTL;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RequiredArgsConstructor
@@ -43,13 +46,10 @@ public class TokenProvider {
     @Value("${jwt.secret.key}")
     private String key;
     private SecretKey secretKey;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final BlackListRepository blackListRepository;
-
     private static final String KEY_ROLE = "role";
     private static final String ACCESS = "Authorization-Access";
     private static final String REFRESH = "Authorization-Refresh";
-
+    private final RedisService redisService;
     @PostConstruct
     private void setSecretKey() {
         secretKey = Keys.hmacShaKeyFor(key.getBytes());
@@ -60,7 +60,7 @@ public class TokenProvider {
     }
 
     public String generateRefreshToken(Authentication authentication) {
-        String refreshToken = generateToken(authentication, TokenValue.REFRESH_TTL, REFRESH);
+        String refreshToken = generateToken(authentication, REFRESH_TTL, REFRESH);
         saveOrUpdate(refreshToken);
 
         return refreshToken;
@@ -114,6 +114,11 @@ public class TokenProvider {
         return false;
     }
 
+    public Date extractTime(String accessToken) {
+
+        return parseClaims(accessToken).getExpiration();
+    }
+
     private Claims parseClaims(String token) {
         try {
             return Jwts.parser().verifyWith(secretKey).build()
@@ -125,10 +130,6 @@ public class TokenProvider {
         } catch (SecurityException e) {
             throw new TokenException(INVALID_SIGNATURE);
         }
-    }
-
-    public Long getExpiration(String token) {
-        return parseClaims(token).getExpiration().getTime();
     }
 
     public String resolveTokenInHeader(HttpServletRequest request) {
@@ -162,20 +163,30 @@ public class TokenProvider {
     }
 
     public boolean existsTokenInBlackList(String token) {
-        BlackList blackList = blackListRepository.findById(token).orElseGet(null);
-        return blackList != null;
+        String blackListToken = redisService.getValue(token, BLACKLIST);
+        return blackListToken != null;
     }
 
     public boolean existsTokenInRefresh(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findById(token).orElseGet(null);
+        String refreshToken = redisService.getValue(token, REFRESH);
         return refreshToken != null;
+    }
+
+    public Long calculateTimeLeft(String token) {
+        Instant expirationTime = extractTime(token).toInstant();
+        Instant now = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
+        return Duration.between(now, expirationTime).getSeconds();
     }
 
     @Transactional
     public void saveOrUpdate(String refreshToken) {
-        RefreshToken token = refreshTokenRepository.findById(refreshToken)
-                .map(o -> o.updateRefreshToken(refreshToken, TokenValue.REFRESH_TTL))
-                .orElseGet(() -> new RefreshToken(refreshToken, TokenValue.REFRESH_TTL));
-        refreshTokenRepository.save(token);
+        String token = redisService.getValue(refreshToken, REFRESH);
+
+        if (token != null) {
+            redisService.saveValue(refreshToken, REFRESH, REFRESH_TTL);
+        } else {
+            Long ttl = calculateTimeLeft(refreshToken);
+            redisService.updateValue(refreshToken, REFRESH, ttl);
+        }
     }
 }

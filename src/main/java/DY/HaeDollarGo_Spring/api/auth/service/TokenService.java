@@ -1,9 +1,7 @@
 package DY.HaeDollarGo_Spring.api.auth.service;
 
-import DY.HaeDollarGo_Spring.api.auth.domain.BlackList;
 import DY.HaeDollarGo_Spring.api.auth.jwt.TokenProvider;
-import DY.HaeDollarGo_Spring.api.auth.repository.BlackListRepository;
-import DY.HaeDollarGo_Spring.api.auth.repository.RefreshTokenRepository;
+import DY.HaeDollarGo_Spring.global.common.RedisValue;
 import DY.HaeDollarGo_Spring.global.common.TokenValue;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,31 +9,29 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static DY.HaeDollarGo_Spring.global.common.RedisValue.BLACKLIST;
+import static DY.HaeDollarGo_Spring.global.common.RedisValue.REFRESH;
+import static DY.HaeDollarGo_Spring.global.common.TokenValue.ACCESS_TTL;
+import static DY.HaeDollarGo_Spring.global.common.TokenValue.REFRESH_TTL;
+
 @RequiredArgsConstructor
 @Service
 public class TokenService {
 
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final BlackListRepository blackListRepository;
     private final TokenProvider tokenProvider;
-
+    private final RedisService redisService;
     private static final String URL = "/auth/success";
 
     @Transactional
     public void updateToken(String accessToken, String refreshToken) {
-        BlackList accessTokenInBlackList = BlackList.builder()
-                .token(accessToken)
-                .ttl(TokenValue.ACCESS_TTL - tokenProvider.getExpiration(accessToken))
-                .build();
 
-        BlackList refreshTokenInBlackList = BlackList.builder()
-                .token(refreshToken)
-                .ttl(TokenValue.REFRESH_TTL - tokenProvider.getExpiration(refreshToken))
-                .build();
+        Long accessTokenTTL = tokenProvider.calculateTimeLeft(accessToken);
+        Long refreshTokenTTL = tokenProvider.calculateTimeLeft(refreshToken);
 
-        blackListRepository.save(accessTokenInBlackList);
-        blackListRepository.save(refreshTokenInBlackList);
-        refreshTokenRepository.deleteById(refreshToken);
+        redisService.updateValue(accessToken, BLACKLIST, accessTokenTTL);
+        redisService.updateValue(refreshToken, BLACKLIST, refreshTokenTTL);
+
+        redisService.deleteValue(refreshToken, REFRESH);
     }
 
     public static void setTokenInHeader(HttpServletResponse response, String token) {
@@ -47,7 +43,7 @@ public class TokenService {
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setPath(URL);
-        cookie.setMaxAge(TokenValue.REFRESH_TTL.intValue());
+        cookie.setMaxAge(REFRESH_TTL.intValue());
         response.addCookie(cookie);
     }
 }
