@@ -1,12 +1,14 @@
 package DY.HaeDollarGo_Spring.api.auth.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RedisService {
@@ -23,6 +25,7 @@ public class RedisService {
     @Transactional
     public void saveValue(String token, String opt, Long ttl) {
         String key = opt + "_" + token;
+        log.info("kekekekeke");
         redisTemplate.opsForValue().set(key, opt, ttl, TimeUnit.MICROSECONDS);
 
     }
