@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RedisService {
@@ -25,7 +24,6 @@ public class RedisService {
     @Transactional
     public void saveValue(String token, String opt, Long ttl) {
         String key = opt + "_" + token;
-        log.info("kekekekeke");
         redisTemplate.opsForValue().set(key, opt, ttl, TimeUnit.MICROSECONDS);
 
     }

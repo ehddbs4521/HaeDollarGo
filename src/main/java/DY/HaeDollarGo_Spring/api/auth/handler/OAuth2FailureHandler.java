@@ -14,7 +14,6 @@ import java.io.IOException;
 
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.FAIL_LOGIN;
 
-@Slf4j
 @Component
 public class OAuth2FailureHandler implements AuthenticationFailureHandler {
     @Override

@@ -20,7 +20,6 @@ import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.NOT_EXIST_REFRESHTOK
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.TOKEN_EXPIRED;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-@Slf4j
 @RequiredArgsConstructor
 @Component
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
@@ -49,10 +48,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 } else {
                     throw new TokenException(NOT_EXIST_REFRESHTOKEN);
                 }
-            } else {
+            }
+            else {
                 throw new TokenException(TOKEN_EXPIRED);
             }
-
         }
 
         filterChain.doFilter(request, response);
@@ -65,6 +64,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean isUnprotectedEndpoint(HttpServletRequest request) {
         String uri = request.getRequestURI();
-        return uri.equals("/") || uri.equals("/auth/success");
+        return uri.equals("/");
     }
 }
