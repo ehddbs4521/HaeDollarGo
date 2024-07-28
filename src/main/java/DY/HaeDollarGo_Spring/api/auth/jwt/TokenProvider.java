@@ -185,8 +185,10 @@ public class TokenProvider {
         String token = redisService.getValue(refreshToken, REFRESH);
         log.info("aaaaaaaaaa");
         if (token != null) {
+            log.info("asdad");
             redisService.saveValue(refreshToken, REFRESH, REFRESH_TTL);
         } else {
+            log.info("vzvv");
             Long ttl = calculateTimeLeft(refreshToken);
             redisService.updateValue(refreshToken, REFRESH, ttl);
         }
