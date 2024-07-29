@@ -7,7 +7,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -20,7 +19,6 @@ import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.NOT_EXIST_REFRESHTOK
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.TOKEN_EXPIRED;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-@Slf4j
 @RequiredArgsConstructor
 @Component
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
@@ -31,15 +29,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        log.info("Request URI in TokenAuthenticationFilter: {}", request.getRequestURI());
-
         if (isUnprotectedEndpoint(request)) {
-            log.info("Unprotected endpoint detected, passing through filter chain.");
             filterChain.doFilter(request, response);
             return;
         }
 
-        log.info("gwrkgr");
         String accessToken = tokenProvider.resolveTokenInHeader(request);
 
         if (tokenProvider.validateToken(accessToken)) {
@@ -69,6 +63,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean isUnprotectedEndpoint(HttpServletRequest request) {
         String uri = request.getRequestURI();
-        return uri.equals("/") || uri.equals("/favicon.ico");
+        return uri.equals("/");
     }
 }
