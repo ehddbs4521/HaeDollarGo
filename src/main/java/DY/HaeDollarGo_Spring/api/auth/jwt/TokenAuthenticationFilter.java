@@ -26,15 +26,19 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-            FilterChain filterChain) throws ServletException, IOException {
+                                    FilterChain filterChain) throws ServletException, IOException {
+
+        log.info("Request URI in TokenAuthenticationFilter: {}", request.getRequestURI());
 
         if (isUnprotectedEndpoint(request)) {
-
+            log.info("Unprotected endpoint detected, passing through filter chain.");
             filterChain.doFilter(request, response);
             return;
         }
+
         log.info("gwrkgr");
         String accessToken = tokenProvider.resolveTokenInHeader(request);
 
@@ -50,8 +54,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 } else {
                     throw new TokenException(NOT_EXIST_REFRESHTOKEN);
                 }
-            }
-            else {
+            } else {
                 throw new TokenException(TOKEN_EXPIRED);
             }
         }
