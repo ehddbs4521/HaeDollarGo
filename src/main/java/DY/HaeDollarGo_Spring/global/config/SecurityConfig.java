@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/").permitAll()
+                        .requestMatchers("/auth/**","/").permitAll()
                         .requestMatchers("/admin/**").hasRole(Admin.toString())
                         .anyRequest().authenticated())
                 .oauth2Login(oauth ->
@@ -61,8 +61,8 @@ public class SecurityConfig {
                                 .successHandler(oAuth2SuccessHandler)
                                 .failureHandler(oAuth2FailureHandler)
                 )
-                .addFilterBefore(new TokenExceptionFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(tokenAuthenticationFilter, TokenExceptionFilter.class)  // TokenExceptionFilter 뒤에 TokenAuthenticationFilter 추가
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new TokenExceptionFilter(), tokenAuthenticationFilter.getClass())
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                         .accessDeniedHandler(jwtAccessDeniedHandler));
