@@ -26,7 +26,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import static DY.HaeDollarGo_Spring.api.auth.domain.Role.Admin;
 
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -61,8 +60,8 @@ public class SecurityConfig {
                                 .successHandler(oAuth2SuccessHandler)
                                 .failureHandler(oAuth2FailureHandler)
                 )
-                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new TokenExceptionFilter(), tokenAuthenticationFilter.getClass())
+                .addFilterBefore(new TokenExceptionFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(tokenAuthenticationFilter, TokenExceptionFilter.class) // Ensure correct order
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                         .accessDeniedHandler(jwtAccessDeniedHandler));
