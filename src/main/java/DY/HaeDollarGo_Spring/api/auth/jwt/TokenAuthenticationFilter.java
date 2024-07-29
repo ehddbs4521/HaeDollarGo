@@ -69,8 +69,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean isUnprotectedEndpoint(HttpServletRequest request) {
         String uri = request.getRequestURI();
-        boolean equals = uri.equals("/");
-        log.info("equals: {}", equals);
-        return equals;
+        return uri.equals("/") || uri.equals("/favicon.ico");
     }
 }
