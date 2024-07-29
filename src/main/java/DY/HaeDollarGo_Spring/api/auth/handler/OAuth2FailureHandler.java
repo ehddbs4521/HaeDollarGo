@@ -14,11 +14,13 @@ import java.io.IOException;
 
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.FAIL_LOGIN;
 
+@Slf4j
 @Component
 public class OAuth2FailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
 
+        log.info("gwgewgw");
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         ObjectMapper objectMapper = new ObjectMapper();

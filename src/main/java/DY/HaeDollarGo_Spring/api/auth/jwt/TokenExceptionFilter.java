@@ -24,8 +24,10 @@ public class TokenExceptionFilter extends OncePerRequestFilter {
             return;
         }
         try {
+            log.info("qwlbr");
             filterChain.doFilter(request, response);
         } catch (TokenException e) {
+            log.info("dbfb");
             response.setContentType("application/json;charset=UTF-8");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             ObjectMapper objectMapper = new ObjectMapper();
