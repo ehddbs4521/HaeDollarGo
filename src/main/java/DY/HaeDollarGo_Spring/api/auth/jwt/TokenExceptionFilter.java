@@ -35,7 +35,7 @@ public class TokenExceptionFilter extends OncePerRequestFilter {
 
     private boolean isUnprotectedEndpoint(HttpServletRequest request) {
         String uri = request.getRequestURI();
-        return uri.equals("/") || uri.equals("/api-docs") || uri.equals("/swagger-ui/index.html");
+        return uri.equals("/") || uri.equals("/api-docs") || uri.equals("/haedollargo-dev.html")|| uri.equals("/api/**");
 
     }
 }

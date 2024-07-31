@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/", "/favicon.ico","/api-docs/**","/swagger-ui/index.html").permitAll()
+                        .requestMatchers("/auth/**", "/", "/favicon.ico", "/api/**", "/api-docs/**", "/haedollargo-dev.html").permitAll()
                         .requestMatchers("/admin/**").hasRole(Admin.toString())
                         .anyRequest().authenticated())
                 .oauth2Login(oauth ->
