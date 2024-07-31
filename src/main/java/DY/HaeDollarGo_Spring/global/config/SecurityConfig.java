@@ -43,20 +43,22 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
-                .requestMatchers("/error", "/favicon.ico");
+                .requestMatchers("/error", "/favicon.ico", "/swagger-ui/**", "/v3/api-docs/**");
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        log.info("asd");
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/", "/favicon.ico", "/api/**", "/api-docs/**", "/haedollargo-dev.html").permitAll()
+                        .requestMatchers("/auth/**", "/", "/favicon.ico",
+                                "/api/**", "/api-docs/**",
+                                "/haedollargo-dev.html",
+                                "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/admin/**").hasRole(Admin.toString())
                         .anyRequest().authenticated())
                 .oauth2Login(oauth ->
