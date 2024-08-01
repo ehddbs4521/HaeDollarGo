@@ -15,6 +15,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.NOT_EXIST_REFRESHTOKEN;
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.TOKEN_EXPIRED;
@@ -31,12 +32,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        log.info("uri: {}", request.getRequestURI());
-        if (isUnprotectedEndpoint(request)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
+        log.info("url:{}", request.getRequestURI());
         String accessToken = tokenProvider.resolveTokenInHeader(request);
 
         if (tokenProvider.validateToken(accessToken)) {
@@ -64,8 +60,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    private boolean isUnprotectedEndpoint(HttpServletRequest request) {
-        String uri = request.getRequestURI();
-        return uri.equals("/") || uri.equals("/api-docs") || uri.equals("/haedollargo-dev.html")|| uri.equals("/api/**");
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String[] excludePath = {"/auth/**", "/api/**", "/haedollargo-dev.html", "/", "/favicon.ico"};
+        String path = request.getRequestURI();
+        return Arrays.stream(excludePath).anyMatch(path::startsWith);
     }
 }

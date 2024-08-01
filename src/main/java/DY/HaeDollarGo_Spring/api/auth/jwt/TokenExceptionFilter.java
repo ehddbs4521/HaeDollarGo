@@ -18,10 +18,6 @@ public class TokenExceptionFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         log.info("uri: {}", request.getRequestURI());
-        if (isUnprotectedEndpoint(request)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
         try {
             filterChain.doFilter(request, response);
         } catch (TokenException e) {
@@ -33,9 +29,4 @@ public class TokenExceptionFilter extends OncePerRequestFilter {
         }
     }
 
-    private boolean isUnprotectedEndpoint(HttpServletRequest request) {
-        String uri = request.getRequestURI();
-        return uri.equals("/") || uri.equals("/api-docs") || uri.equals("/haedollargo-dev.html")|| uri.equals("/api/**");
-
-    }
 }
