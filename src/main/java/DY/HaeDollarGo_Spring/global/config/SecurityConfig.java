@@ -44,7 +44,7 @@ public class SecurityConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
-                .requestMatchers("/error", "/favicon.ico", "/swagger-ui/**", "/v3/api-docs/**");
+                .requestMatchers("/error", "/favicon.ico","/haedollargo-dev.html");
     }
 
     @Bean
@@ -58,9 +58,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 new AntPathRequestMatcher("/auth/**"),
                                 new AntPathRequestMatcher("/"),
-                                new AntPathRequestMatcher("/api/**"),
-                                new AntPathRequestMatcher("/api-docs/**"),
-                                new AntPathRequestMatcher("/haedollargo-dev.html")
+                                new AntPathRequestMatcher("/api-docs/**")
                         )
                         .permitAll()
                         .requestMatchers("/admin/**").hasRole(Admin.toString())
