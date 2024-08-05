@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -14,11 +15,14 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
+import static DY.HaeDollarGo_Spring.api.auth.service.TokenService.setTokenInCookie;
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.NOT_EXIST_REFRESHTOKEN;
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.TOKEN_EXPIRED;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
@@ -29,24 +33,24 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        if (isUnprotectedEndpoint(request)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         String accessToken = tokenProvider.resolveTokenInHeader(request);
 
         if (tokenProvider.validateToken(accessToken)) {
             setAuthentication(accessToken);
         } else {
             if (request.getRequestURI().equals("/auth/reissue")) {
-                String refreshTokenInCookie = tokenProvider.getRefreshTokenInCookie(request);
-                String reissueAccessToken = tokenProvider.reissueToken(refreshTokenInCookie);
+                String refreshToken = tokenProvider.getRefreshTokenInCookie(request);
+                String reissueAccessToken = tokenProvider.reissueAccessToken(refreshToken);
                 if (StringUtils.hasText(reissueAccessToken)) {
                     setAuthentication(reissueAccessToken);
                     response.setHeader(AUTHORIZATION, TokenValue.TOKEN_PREFIX + reissueAccessToken);
-                } else {
+                }
+                else {
                     throw new TokenException(NOT_EXIST_REFRESHTOKEN);
+                }
+                if (tokenProvider.isRotateToken(refreshToken)) {
+                    String reissueRefreshToken = tokenProvider.reissueRefreshToken(refreshToken);
+                    setTokenInCookie(response, reissueRefreshToken);
                 }
             } else {
                 throw new TokenException(TOKEN_EXPIRED);
@@ -61,8 +65,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    private boolean isUnprotectedEndpoint(HttpServletRequest request) {
-        String uri = request.getRequestURI();
-        return uri.equals("/");
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String[] excludePath = {"/auth/**", "/", "/swagger-ui/**"};
+        String path = request.getRequestURI();
+        return Arrays.stream(excludePath).anyMatch(path::startsWith);
     }
 }

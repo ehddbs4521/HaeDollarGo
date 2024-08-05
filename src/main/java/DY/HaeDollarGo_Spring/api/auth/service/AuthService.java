@@ -10,12 +10,11 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final TokenProvider tokenProvider;
-    private final TokenService tokenService;
+    private final RedisService redisService;
 
 
     public void logout(HttpServletRequest request) {
-        String accessToken = tokenProvider.resolveTokenInHeader(request);
         String refreshToken = tokenProvider.getRefreshTokenInCookie(request);
-        tokenService.updateToken(accessToken,refreshToken);
+        redisService.deleteValue(refreshToken);
     }
 }

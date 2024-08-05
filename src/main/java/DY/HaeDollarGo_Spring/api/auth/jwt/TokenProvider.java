@@ -2,7 +2,6 @@ package DY.HaeDollarGo_Spring.api.auth.jwt;
 
 import DY.HaeDollarGo_Spring.api.auth.exception.TokenException;
 import DY.HaeDollarGo_Spring.api.auth.service.RedisService;
-import DY.HaeDollarGo_Spring.global.common.RedisValue;
 import DY.HaeDollarGo_Spring.global.common.TokenValue;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -30,14 +29,14 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.*;
-import static DY.HaeDollarGo_Spring.global.common.RedisValue.BLACKLIST;
-import static DY.HaeDollarGo_Spring.global.common.TokenValue.REFRESH_TTL;
+import static DY.HaeDollarGo_Spring.global.common.TokenValue.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RequiredArgsConstructor
@@ -47,9 +46,8 @@ public class TokenProvider {
     @Value("${jwt.secret.key}")
     private String key;
     private SecretKey secretKey;
+    private static final String USER_KEY = "user";
     private static final String KEY_ROLE = "role";
-    private static final String ACCESS = "Authorization-Access";
-    private static final String REFRESH = "Authorization-Refresh";
     private final RedisService redisService;
     @PostConstruct
     private void setSecretKey() {
@@ -57,11 +55,11 @@ public class TokenProvider {
     }
 
     public String generateAccessToken(Authentication authentication) {
-        return generateToken(authentication, TokenValue.ACCESS_TTL, ACCESS);
+        return generateToken(authentication, TokenValue.ACCESS_TTL, ACCESS_HEADER);
     }
 
     public String generateRefreshToken(Authentication authentication) {
-        String refreshToken = generateToken(authentication, REFRESH_TTL, REFRESH);
+        String refreshToken = generateToken(authentication, REFRESH_TTL, REFRESH_HEADER);
         saveOrUpdate(refreshToken);
 
         return refreshToken;
@@ -77,6 +75,7 @@ public class TokenProvider {
 
         return Jwts.builder()
                 .subject(tokenType)
+                .claim(USER_KEY, authentication.getName())
                 .claim(KEY_ROLE, authorities)
                 .issuedAt(now)
                 .expiration(expiredDate)
@@ -97,18 +96,22 @@ public class TokenProvider {
                 claims.get(KEY_ROLE).toString()));
     }
 
-    public String reissueToken(String token) {
+    public String reissueAccessToken(String token) {
         if (validateToken(token)) {
             if (existsTokenInRefresh(token)) {
                 return generateAccessToken(getAuthentication(token));
             }
         }
-
         return null;
     }
 
+    public String reissueRefreshToken(String token) {
+
+        return generateRefreshToken(getAuthentication(token));
+    }
+
     boolean validateToken(String token) {
-        if (StringUtils.hasText(token) && !existsTokenInBlackList(token)) {
+        if (StringUtils.hasText(token)) {
             Claims claims = parseClaims(token);
             return claims.getExpiration().after(new Date());
         }
@@ -120,7 +123,7 @@ public class TokenProvider {
         return parseClaims(accessToken).getExpiration();
     }
 
-    private Claims parseClaims(String token) {
+    public Claims parseClaims(String token) {
         try {
             return Jwts.parser().verifyWith(secretKey).build()
                     .parseSignedClaims(token).getPayload();
@@ -152,7 +155,7 @@ public class TokenProvider {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("Authorization-Refresh".equals(cookie.getName())) {
+                if (REFRESH_HEADER.equals(cookie.getName())) {
                     String refreshToken = resolveTokenInCookie(cookie.getValue());
                     if (StringUtils.hasText(refreshToken)) {
                         return refreshToken;
@@ -163,13 +166,8 @@ public class TokenProvider {
         return null;
     }
 
-    public boolean existsTokenInBlackList(String token) {
-        String blackListToken = redisService.getValue(token, BLACKLIST);
-        return blackListToken != null;
-    }
-
     public boolean existsTokenInRefresh(String token) {
-        String refreshToken = redisService.getValue(token, RedisValue.REFRESH);
+        String refreshToken = redisService.getValue(token);
         return refreshToken != null;
     }
 
@@ -181,12 +179,19 @@ public class TokenProvider {
 
     @Transactional
     public void saveOrUpdate(String refreshToken) {
-        String token = redisService.getValue(refreshToken, RedisValue.REFRESH);
+
+        String userKey = parseClaims(refreshToken).get(USER_KEY).toString();
+        String token = redisService.getValue(refreshToken);
         if (token == null) {
-            redisService.saveValue(refreshToken, RedisValue.REFRESH, REFRESH_TTL);
+            redisService.saveValue(userKey, refreshToken, REFRESH_TTL);
         } else {
             Long ttl = calculateTimeLeft(refreshToken);
-            redisService.updateValue(refreshToken, RedisValue.REFRESH, ttl);
+            redisService.saveValue(userKey, refreshToken, ttl);
         }
+    }
+
+    public boolean isRotateToken(String refreshToken) {
+        Instant issuedInstant = parseClaims(refreshToken).getIssuedAt().toInstant();
+        return Instant.now().isAfter(issuedInstant.plus(24, ChronoUnit.HOURS));
     }
 }
