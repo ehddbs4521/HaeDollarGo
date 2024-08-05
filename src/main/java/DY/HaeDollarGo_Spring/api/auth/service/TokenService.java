@@ -1,12 +1,10 @@
 package DY.HaeDollarGo_Spring.api.auth.service;
 
-import DY.HaeDollarGo_Spring.api.auth.jwt.TokenProvider;
 import DY.HaeDollarGo_Spring.global.common.TokenValue;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import static DY.HaeDollarGo_Spring.global.common.TokenValue.REFRESH_TTL;
 

@@ -29,6 +29,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -95,14 +96,18 @@ public class TokenProvider {
                 claims.get(KEY_ROLE).toString()));
     }
 
-    public String reissueToken(String token) {
+    public String reissueAccessToken(String token) {
         if (validateToken(token)) {
             if (existsTokenInRefresh(token)) {
                 return generateAccessToken(getAuthentication(token));
             }
         }
-
         return null;
+    }
+
+    public String reissueRefreshToken(String token) {
+
+        return generateRefreshToken(getAuthentication(token));
     }
 
     boolean validateToken(String token) {
@@ -174,13 +179,19 @@ public class TokenProvider {
 
     @Transactional
     public void saveOrUpdate(String refreshToken) {
+
+        String userKey = parseClaims(refreshToken).get(USER_KEY).toString();
         String token = redisService.getValue(refreshToken);
-        String userKey = parseClaims(token).get(USER_KEY).toString();
         if (token == null) {
             redisService.saveValue(userKey, refreshToken, REFRESH_TTL);
         } else {
             Long ttl = calculateTimeLeft(refreshToken);
             redisService.saveValue(userKey, refreshToken, ttl);
         }
+    }
+
+    public boolean isRotateToken(String refreshToken) {
+        Instant issuedInstant = parseClaims(refreshToken).getIssuedAt().toInstant();
+        return Instant.now().isAfter(issuedInstant.plus(24, ChronoUnit.HOURS));
     }
 }
