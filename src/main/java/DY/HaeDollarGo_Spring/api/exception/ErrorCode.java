@@ -18,7 +18,7 @@ public enum ErrorCode {
     FAIL_LOGIN(BAD_REQUEST,"AE4","로그인 실패"),
     INVALID_TOKEN(UNAUTHORIZED,"AE5","유효하지 않은 토큰입니다"),
     INVALID_SIGNATURE(UNAUTHORIZED,"AE6","유효하지 않은 서명입니다"),
-    TOKEN_EXPIRED(BAD_REQUEST,"AE7","유효하지 않은 서명입니다"),
+    TOKEN_EXPIRED(BAD_REQUEST,"AE7","토큰이 만료되었습니다"),
     NOT_EXIST_REFRESHTOKEN(NOT_FOUND, "AE8", "존재하지않는 토큰입니다.");
 
 
