@@ -39,7 +39,6 @@ import java.util.stream.Collectors;
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.*;
 import static DY.HaeDollarGo_Spring.global.common.TokenValue.*;
 
-@Slf4j
 @RequiredArgsConstructor
 @Component
 public class TokenProvider {
@@ -113,7 +112,6 @@ public class TokenProvider {
 
     boolean validateToken(String token) {
         if (StringUtils.hasText(token)) {
-            log.info("good!");
             parseClaims(token);
             return true;
         }
@@ -127,26 +125,20 @@ public class TokenProvider {
 
     public Claims parseClaims(String token) {
         try {
-            log.info("first");
             return Jwts.parser().verifyWith(secretKey).build()
                     .parseSignedClaims(token).getPayload();
         } catch (ExpiredJwtException e) {
-            log.info("second");
             throw new TokenException(TOKEN_EXPIRED);
         } catch (MalformedJwtException e) {
-            log.info("third");
             throw new TokenException(INVALID_TOKEN);
         } catch (SecurityException e) {
-            log.info("fourth");
             throw new TokenException(INVALID_SIGNATURE);
         }
     }
 
     public String resolveTokenInHeader(HttpServletRequest request) {
-        log.info("sadad");
         String token = request.getHeader(ACCESS_HEADER);
         if (ObjectUtils.isEmpty(token) || !token.startsWith(TokenValue.TOKEN_PREFIX)) {
-            log.info("sb");
             return null;
         }
         return token.substring(TokenValue.TOKEN_PREFIX.length());

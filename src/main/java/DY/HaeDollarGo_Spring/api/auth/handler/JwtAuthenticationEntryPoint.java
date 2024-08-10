@@ -14,14 +14,12 @@ import java.io.IOException;
 
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.FAIL_LOGIN;
 
-@Slf4j
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
-        log.info("2222");
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         ObjectMapper objectMapper = new ObjectMapper();

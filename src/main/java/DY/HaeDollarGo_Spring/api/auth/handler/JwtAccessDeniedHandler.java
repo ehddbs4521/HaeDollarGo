@@ -14,14 +14,12 @@ import java.io.IOException;
 
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.SC_FORBIDDEN;
 
-@Slf4j
 @Component
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        log.info("1111");
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         ObjectMapper objectMapper = new ObjectMapper();

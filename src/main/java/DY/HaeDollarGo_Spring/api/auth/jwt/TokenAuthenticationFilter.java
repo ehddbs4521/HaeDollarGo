@@ -16,14 +16,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import static DY.HaeDollarGo_Spring.api.auth.service.TokenService.setTokenInCookie;
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.NOT_EXIST_REFRESHTOKEN;
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.TOKEN_EXPIRED;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-@Slf4j
 @RequiredArgsConstructor
 @Component
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
@@ -33,39 +31,27 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        log.info("yes");
         String accessToken = tokenProvider.resolveTokenInHeader(request);
-        log.info("token: {}", accessToken);
+
         if (tokenProvider.validateToken(accessToken)) {
-            log.info("1");
             setAuthentication(accessToken);
         }
         else {
             if (request.getRequestURI().equals("/auth/reissue")) {
-                log.info("2");
-
                 String refreshToken = tokenProvider.getRefreshTokenInCookie(request);
                 String reissueAccessToken = tokenProvider.reissueAccessToken(refreshToken);
                 if (StringUtils.hasText(reissueAccessToken)) {
-                    log.info("3");
-
                     setAuthentication(reissueAccessToken);
                     response.setHeader(AUTHORIZATION, TokenValue.TOKEN_PREFIX + reissueAccessToken);
                 }
                 else {
-                    log.info("4");
-
                     throw new TokenException(NOT_EXIST_REFRESHTOKEN);
                 }
                 if (tokenProvider.isRotateToken(refreshToken)) {
-                    log.info("5");
-
                     String reissueRefreshToken = tokenProvider.reissueRefreshToken(refreshToken);
                     setTokenInCookie(response, reissueRefreshToken);
                 }
             } else {
-                log.info("6");
-
                 throw new TokenException(TOKEN_EXPIRED);
             }
         }
@@ -80,7 +66,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        log.info("7");
 
         AntPathMatcher pathMatcher = new AntPathMatcher();
         String[] excludePath = {"/auth/**", "/", "/swagger-ui/**"};

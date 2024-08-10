@@ -28,7 +28,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import static DY.HaeDollarGo_Spring.api.auth.domain.Role.Admin;
 
-@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
