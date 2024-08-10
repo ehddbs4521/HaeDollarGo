@@ -32,7 +32,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-
+        log.info("yes");
         String accessToken = tokenProvider.resolveTokenInHeader(request);
         log.info("token: {}", accessToken);
         if (tokenProvider.validateToken(accessToken)) {

@@ -140,8 +140,10 @@ public class TokenProvider {
     }
 
     public String resolveTokenInHeader(HttpServletRequest request) {
+        log.info("sadad");
         String token = request.getHeader(ACCESS_HEADER);
         if (ObjectUtils.isEmpty(token) || !token.startsWith(TokenValue.TOKEN_PREFIX)) {
+            log.info("sb");
             return null;
         }
         return token.substring(TokenValue.TOKEN_PREFIX.length());
