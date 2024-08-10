@@ -82,6 +82,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         log.info("7");
         String[] excludePath = {"/auth/**", "/", "/swagger-ui/**"};
         String path = request.getRequestURI();
-        return Arrays.stream(excludePath).anyMatch(path::startsWith);
+        boolean result = Arrays.stream(excludePath).anyMatch(path::startsWith);
+
+        log.info("result:{}", result);
+        return result;
     }
 }
