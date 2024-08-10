@@ -36,24 +36,35 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = tokenProvider.resolveTokenInHeader(request);
 
         if (tokenProvider.validateToken(accessToken)) {
+            log.info("1");
             setAuthentication(accessToken);
         }
         else {
             if (request.getRequestURI().equals("/auth/reissue")) {
+                log.info("2");
+
                 String refreshToken = tokenProvider.getRefreshTokenInCookie(request);
                 String reissueAccessToken = tokenProvider.reissueAccessToken(refreshToken);
                 if (StringUtils.hasText(reissueAccessToken)) {
+                    log.info("3");
+
                     setAuthentication(reissueAccessToken);
                     response.setHeader(AUTHORIZATION, TokenValue.TOKEN_PREFIX + reissueAccessToken);
                 }
                 else {
+                    log.info("4");
+
                     throw new TokenException(NOT_EXIST_REFRESHTOKEN);
                 }
                 if (tokenProvider.isRotateToken(refreshToken)) {
+                    log.info("5");
+
                     String reissueRefreshToken = tokenProvider.reissueRefreshToken(refreshToken);
                     setTokenInCookie(response, reissueRefreshToken);
                 }
             } else {
+                log.info("6");
+
                 throw new TokenException(TOKEN_EXPIRED);
             }
         }
@@ -68,6 +79,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        log.info("7");
         String[] excludePath = {"/", "/swagger-ui/**"};
         String path = request.getRequestURI();
         return Arrays.stream(excludePath).anyMatch(path::startsWith);
