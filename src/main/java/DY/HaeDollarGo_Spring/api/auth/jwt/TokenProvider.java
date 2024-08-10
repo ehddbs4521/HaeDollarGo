@@ -128,13 +128,17 @@ public class TokenProvider {
 
     public Claims parseClaims(String token) {
         try {
+            log.info("first");
             return Jwts.parser().verifyWith(secretKey).build()
                     .parseSignedClaims(token).getPayload();
         } catch (ExpiredJwtException e) {
+            log.info("second");
             throw new TokenException(TOKEN_EXPIRED);
         } catch (MalformedJwtException e) {
+            log.info("third");
             throw new TokenException(INVALID_TOKEN);
         } catch (SecurityException e) {
+            log.info("fourth");
             throw new TokenException(INVALID_SIGNATURE);
         }
     }
