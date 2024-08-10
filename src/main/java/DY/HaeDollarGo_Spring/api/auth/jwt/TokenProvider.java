@@ -38,7 +38,6 @@ import java.util.stream.Collectors;
 
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.*;
 import static DY.HaeDollarGo_Spring.global.common.TokenValue.*;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Slf4j
 @RequiredArgsConstructor
