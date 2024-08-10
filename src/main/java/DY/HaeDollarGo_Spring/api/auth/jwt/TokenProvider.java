@@ -13,6 +13,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -39,6 +40,7 @@ import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.*;
 import static DY.HaeDollarGo_Spring.global.common.TokenValue.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class TokenProvider {
@@ -112,6 +114,7 @@ public class TokenProvider {
 
     boolean validateToken(String token) {
         if (StringUtils.hasText(token)) {
+            log.info("good!");
             parseClaims(token);
             return true;
         }

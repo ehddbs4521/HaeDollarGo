@@ -25,9 +25,8 @@ public class AuthController {
     }
 
     @GetMapping("/success")
-    public String test(HttpServletResponse response) {
-        String key = response.getHeader("Authorization-Access");
+    public String test() {
 
-        return key;
+        return "success";
     }
 }
