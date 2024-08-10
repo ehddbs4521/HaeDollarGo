@@ -15,20 +15,20 @@ public class RedisService {
     private final RedisTemplate redisTemplate;
 
 
-    public String getValue(String userKey) {
-        Object value = redisTemplate.opsForValue().get(userKey);
+    public String getValue(String token) {
+        Object value = redisTemplate.opsForValue().get(token);
         return value != null ? value.toString() : null;
     }
 
     @Transactional
-    public void saveValue(String userKey, String token, Long ttl) {
+    public void saveValue(String token, String userKey, Long ttl) {
 
-        redisTemplate.opsForValue().set(userKey, token, ttl, TimeUnit.MICROSECONDS);
+        redisTemplate.opsForValue().set(token, userKey, ttl, TimeUnit.MICROSECONDS);
     }
 
     @Transactional
-    public void deleteValue(String userKey) {
+    public void deleteValue(String token) {
 
-        redisTemplate.delete(userKey);
+        redisTemplate.delete(token);
     }
 }

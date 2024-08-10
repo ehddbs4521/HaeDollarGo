@@ -112,8 +112,8 @@ public class TokenProvider {
 
     boolean validateToken(String token) {
         if (StringUtils.hasText(token)) {
-            Claims claims = parseClaims(token);
-            return claims.getExpiration().after(new Date());
+            parseClaims(token);
+            return true;
         }
         return false;
     }
@@ -167,8 +167,8 @@ public class TokenProvider {
     }
 
     public boolean existsTokenInRefresh(String token) {
-        String refreshToken = redisService.getValue(token);
-        return refreshToken != null;
+        String userKey = redisService.getValue(token);
+        return userKey != null;
     }
 
     public Long calculateTimeLeft(String token) {
@@ -180,13 +180,13 @@ public class TokenProvider {
     @Transactional
     public void saveOrUpdate(String refreshToken) {
 
-        String userKey = parseClaims(refreshToken).get(USER_KEY).toString();
-        String token = redisService.getValue(refreshToken);
-        if (token == null) {
-            redisService.saveValue(userKey, refreshToken, REFRESH_TTL);
+        String userKey = redisService.getValue(refreshToken);
+        if (userKey == null) {
+            userKey = parseClaims(refreshToken).get(USER_KEY).toString();
+            redisService.saveValue(refreshToken, userKey, REFRESH_TTL);
         } else {
             Long ttl = calculateTimeLeft(refreshToken);
-            redisService.saveValue(userKey, refreshToken, ttl);
+            redisService.saveValue(refreshToken, userKey, ttl);
         }
     }
 

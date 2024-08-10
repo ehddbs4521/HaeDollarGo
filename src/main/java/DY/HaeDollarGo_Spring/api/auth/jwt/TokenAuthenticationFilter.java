@@ -37,7 +37,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
         if (tokenProvider.validateToken(accessToken)) {
             setAuthentication(accessToken);
-        } else {
+        }
+        else {
             if (request.getRequestURI().equals("/auth/reissue")) {
                 String refreshToken = tokenProvider.getRefreshTokenInCookie(request);
                 String reissueAccessToken = tokenProvider.reissueAccessToken(refreshToken);
@@ -67,7 +68,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String[] excludePath = {"/auth/**", "/", "/swagger-ui/**"};
+        String[] excludePath = {"/", "/swagger-ui/**"};
         String path = request.getRequestURI();
         return Arrays.stream(excludePath).anyMatch(path::startsWith);
     }
