@@ -140,7 +140,7 @@ public class TokenProvider {
     }
 
     public String resolveTokenInHeader(HttpServletRequest request) {
-        String token = request.getHeader(AUTHORIZATION);
+        String token = request.getHeader(ACCESS_HEADER);
         if (ObjectUtils.isEmpty(token) || !token.startsWith(TokenValue.TOKEN_PREFIX)) {
             return null;
         }
