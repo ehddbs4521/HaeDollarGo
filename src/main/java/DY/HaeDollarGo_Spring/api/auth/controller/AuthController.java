@@ -23,4 +23,11 @@ public class AuthController {
         authService.logout(request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/success")
+    public String test(HttpServletResponse response) {
+        String key = response.getHeader("Authorization-Access");
+
+        return key;
+    }
 }
