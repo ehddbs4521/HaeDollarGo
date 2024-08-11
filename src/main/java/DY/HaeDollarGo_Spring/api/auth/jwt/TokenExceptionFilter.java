@@ -11,6 +11,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 public class TokenExceptionFilter extends OncePerRequestFilter {
 
     @Override
@@ -20,6 +21,7 @@ public class TokenExceptionFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (TokenException e) {
+            log.info("e:{}", e.getMessage());
             response.setContentType("application/json;charset=UTF-8");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             ObjectMapper objectMapper = new ObjectMapper();
