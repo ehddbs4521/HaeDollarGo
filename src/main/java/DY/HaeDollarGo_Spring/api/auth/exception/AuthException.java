@@ -7,6 +7,6 @@ import DY.HaeDollarGo_Spring.api.exception.ErrorCode;
 public class AuthException extends CustomException {
 
     public AuthException(ErrorCode errorCode) {
-        super(httpStatus, errorCode);
+        super(errorCode);
     }
 }

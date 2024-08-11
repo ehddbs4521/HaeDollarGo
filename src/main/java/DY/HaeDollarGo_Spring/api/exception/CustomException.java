@@ -10,16 +10,16 @@ public abstract class CustomException extends RuntimeException {
     private final String code;
     private final String message;
 
-    public CustomException(HttpStatus httpStatus, ErrorCode errorCode) {
+    public CustomException(ErrorCode errorCode) {
         super(errorCode.getMessage());
-        this.httpStatus = httpStatus;
+        this.httpStatus = errorCode.getHttpStatus();
         this.code = errorCode.getCode();
         this.message = errorCode.getMessage();
     }
 
-    public CustomException(HttpStatus httpStatus, ErrorCode errorCode, String message) {
+    public CustomException(ErrorCode errorCode, String message) {
         super(message);
-        this.httpStatus = httpStatus;
+        this.httpStatus = errorCode.getHttpStatus();
         this.code = errorCode.getCode();
         this.message = message;
     }
