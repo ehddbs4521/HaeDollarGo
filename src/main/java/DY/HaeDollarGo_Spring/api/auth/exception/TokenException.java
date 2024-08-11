@@ -7,6 +7,6 @@ import DY.HaeDollarGo_Spring.api.exception.ErrorCode;
 public class TokenException extends CustomException {
 
     public TokenException(ErrorCode errorCode) {
-        super(errorCode);
+        super(httpStatus, errorCode);
     }
 }
