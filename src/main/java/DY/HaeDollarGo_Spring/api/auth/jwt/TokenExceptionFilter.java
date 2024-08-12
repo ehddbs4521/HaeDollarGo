@@ -25,7 +25,7 @@ public class TokenExceptionFilter extends OncePerRequestFilter {
             response.setContentType("application/json;charset=UTF-8");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             ObjectMapper objectMapper = new ObjectMapper();
-            String errorJson = objectMapper.writeValueAsString(e);
+            String errorJson = objectMapper.writeValueAsString(e.getCode());
             response.getWriter().print(errorJson);
         }
     }
