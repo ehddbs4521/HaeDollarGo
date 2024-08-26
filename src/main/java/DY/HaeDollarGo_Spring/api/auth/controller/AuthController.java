@@ -23,4 +23,9 @@ public class AuthController {
         authService.logout(request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/test")
+    public String test() {
+        return "test";
+    }
 }

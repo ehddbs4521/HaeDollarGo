@@ -2,6 +2,7 @@ package DY.HaeDollarGo_Spring.api.auth.dto;
 
 import DY.HaeDollarGo_Spring.api.auth.domain.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+@Slf4j
 @RequiredArgsConstructor
 public class CustomUserDetails implements OAuth2User, UserDetails {
 
@@ -20,7 +22,9 @@ public class CustomUserDetails implements OAuth2User, UserDetails {
 
     @Override
     public String getName() {
-        return attributes.get(attributeKey).toString();
+        String value = attributes.get(attributeKey).toString();
+        log.info("value: {}", value);
+        return value;
     }
 
     @Override

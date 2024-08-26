@@ -7,11 +7,14 @@ import DY.HaeDollarGo_Spring.api.util.RandomCreater;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
+import java.util.UUID;
 
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.WRONG_REGISTRATION_ID;
 
+@Slf4j
 @Getter
 @Builder
 @RequiredArgsConstructor
@@ -34,8 +37,8 @@ public class OAuth2UserInfo {
 
     private static OAuth2UserInfo ofGoogle(Map<String, Object> attributes) {
 
-        String googleUserKey = (String) attributes.get("sub");
-        
+        String googleUserKey = UUID.randomUUID().toString();
+        log.info("key:{}", googleUserKey);
         return OAuth2UserInfo.builder()
                 .nickName(RandomCreater.generateKey())
                 .email((String) attributes.get("email"))
@@ -48,7 +51,8 @@ public class OAuth2UserInfo {
     private static OAuth2UserInfo ofKakao(Map<String, Object> attributes) {
         Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> profile = (Map<String, Object>) account.get("profile");
-        String kakaoUserKey = String.valueOf(attributes.get("id"));
+        String kakaoUserKey = UUID.randomUUID().toString();
+        log.info("key:{}", kakaoUserKey);
 
         return OAuth2UserInfo.builder()
                 .nickName(RandomCreater.generateKey())
@@ -61,7 +65,9 @@ public class OAuth2UserInfo {
 
     private static OAuth2UserInfo ofNaver(Map<String, Object> attributes) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-        String naverUserKey = (String) response.get("id");
+        String naverUserKey = UUID.randomUUID().toString();
+        log.info("key:{}", naverUserKey);
+
 
         return OAuth2UserInfo.builder()
                 .nickName(RandomCreater.generateKey())
