@@ -7,11 +7,14 @@ import DY.HaeDollarGo_Spring.api.util.RandomCreater;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
+import java.util.UUID;
 
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.WRONG_REGISTRATION_ID;
 
+@Slf4j
 @Getter
 @Builder
 @RequiredArgsConstructor
@@ -35,7 +38,7 @@ public class OAuth2UserInfo {
     private static OAuth2UserInfo ofGoogle(Map<String, Object> attributes) {
 
         String googleUserKey = (String) attributes.get("sub");
-        
+
         return OAuth2UserInfo.builder()
                 .nickName(RandomCreater.generateKey())
                 .email((String) attributes.get("email"))
@@ -62,7 +65,7 @@ public class OAuth2UserInfo {
     private static OAuth2UserInfo ofNaver(Map<String, Object> attributes) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
         String naverUserKey = (String) response.get("id");
-
+        log.info("key:{}", naverUserKey);
         return OAuth2UserInfo.builder()
                 .nickName(RandomCreater.generateKey())
                 .email((String) response.get("email"))

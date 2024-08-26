@@ -7,22 +7,20 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import static DY.HaeDollarGo_Spring.api.auth.service.TokenService.setTokenInCookie;
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.NOT_EXIST_REFRESHTOKEN;
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.TOKEN_EXPIRED;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
-@Slf4j
 @RequiredArgsConstructor
 @Component
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
@@ -32,12 +30,12 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-
         String accessToken = tokenProvider.resolveTokenInHeader(request);
 
         if (tokenProvider.validateToken(accessToken)) {
             setAuthentication(accessToken);
-        } else {
+        }
+        else {
             if (request.getRequestURI().equals("/auth/reissue")) {
                 String refreshToken = tokenProvider.getRefreshTokenInCookie(request);
                 String reissueAccessToken = tokenProvider.reissueAccessToken(refreshToken);
@@ -67,8 +65,16 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+
+        AntPathMatcher pathMatcher = new AntPathMatcher();
         String[] excludePath = {"/auth/**", "/", "/swagger-ui/**"};
         String path = request.getRequestURI();
-        return Arrays.stream(excludePath).anyMatch(path::startsWith);
+
+        for (String pattern : excludePath) {
+            if (pathMatcher.match(pattern, path)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
