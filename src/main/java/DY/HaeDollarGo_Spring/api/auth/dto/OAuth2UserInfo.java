@@ -65,7 +65,7 @@ public class OAuth2UserInfo {
     private static OAuth2UserInfo ofNaver(Map<String, Object> attributes) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
         String naverUserKey = (String) response.get("id");
-
+        log.info("key:{}", naverUserKey);
         return OAuth2UserInfo.builder()
                 .nickName(RandomCreater.generateKey())
                 .email((String) response.get("email"))
