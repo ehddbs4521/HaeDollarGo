@@ -32,7 +32,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfo.of(registrationId, oAuth2UserAttributes);
         User user = getOrSave(oAuth2UserInfo);
-
+        log.info("dasdasd");
         return new CustomUserDetails(user, oAuth2UserAttributes, userNameAttributeName);
     }
 
