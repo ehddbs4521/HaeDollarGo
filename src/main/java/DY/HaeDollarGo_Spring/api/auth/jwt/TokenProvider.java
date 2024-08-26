@@ -13,6 +13,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 import static DY.HaeDollarGo_Spring.api.exception.ErrorCode.*;
 import static DY.HaeDollarGo_Spring.global.common.TokenValue.*;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class TokenProvider {
@@ -45,7 +47,7 @@ public class TokenProvider {
     @Value("${jwt.secret.key}")
     private String key;
     private SecretKey secretKey;
-    private static final String USER_KEY = "user";
+    private static final String UID = "uid";
     private static final String KEY_ROLE = "role";
     private final RedisService redisService;
     @PostConstruct
@@ -67,14 +69,14 @@ public class TokenProvider {
     private String generateToken(Authentication authentication, long expireTime, String tokenType) {
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + expireTime);
-
+        log.info("name:{}", authentication.getName());
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining());
 
         return Jwts.builder()
                 .subject(tokenType)
-                .claim(USER_KEY, authentication.getName())
+                .claim(UID, authentication.getName())
                 .claim(KEY_ROLE, authorities)
                 .issuedAt(now)
                 .expiration(expiredDate)
@@ -181,7 +183,7 @@ public class TokenProvider {
 
         String userKey = redisService.getValue(refreshToken);
         if (userKey == null) {
-            userKey = parseClaims(refreshToken).get(USER_KEY).toString();
+            userKey = parseClaims(refreshToken).get(UID).toString();
             redisService.saveValue(refreshToken, userKey, REFRESH_TTL);
         } else {
             Long ttl = calculateTimeLeft(refreshToken);

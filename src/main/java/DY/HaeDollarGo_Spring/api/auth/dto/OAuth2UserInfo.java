@@ -37,8 +37,8 @@ public class OAuth2UserInfo {
 
     private static OAuth2UserInfo ofGoogle(Map<String, Object> attributes) {
 
-        String googleUserKey = UUID.randomUUID().toString();
-        log.info("key:{}", googleUserKey);
+        String googleUserKey = (String) attributes.get("sub");
+
         return OAuth2UserInfo.builder()
                 .nickName(RandomCreater.generateKey())
                 .email((String) attributes.get("email"))
@@ -51,8 +51,7 @@ public class OAuth2UserInfo {
     private static OAuth2UserInfo ofKakao(Map<String, Object> attributes) {
         Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> profile = (Map<String, Object>) account.get("profile");
-        String kakaoUserKey = UUID.randomUUID().toString();
-        log.info("key:{}", kakaoUserKey);
+        String kakaoUserKey = String.valueOf(attributes.get("id"));
 
         return OAuth2UserInfo.builder()
                 .nickName(RandomCreater.generateKey())
@@ -65,9 +64,7 @@ public class OAuth2UserInfo {
 
     private static OAuth2UserInfo ofNaver(Map<String, Object> attributes) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
-        String naverUserKey = UUID.randomUUID().toString();
-        log.info("key:{}", naverUserKey);
-
+        String naverUserKey = (String) response.get("id");
 
         return OAuth2UserInfo.builder()
                 .nickName(RandomCreater.generateKey())
