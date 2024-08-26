@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,5 +28,14 @@ public class AuthController {
     @GetMapping("/success")
     public String test() {
         return "success";
+    }
+
+    @GetMapping("/test")
+    public String a(Authentication authentication) {
+        System.out.println("authentication.getName() = " + authentication.getName());
+
+        System.out.println("authentication = " + authentication.getPrincipal().toString());
+
+        return "good";
     }
 }
