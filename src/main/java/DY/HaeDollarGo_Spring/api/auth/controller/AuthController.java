@@ -24,8 +24,8 @@ public class AuthController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/test")
+    @GetMapping("/success")
     public String test() {
-        return "test";
+        return "success";
     }
 }
